@@ -2,22 +2,32 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
+
 var port = process.env.PORT || 8080;
 
+var messages = [];
+
+var storeMessage = function(name, data){
+  messages.push({name: name, data: data});
+  if (messages.length > 10){
+    messages.shift();
+  }
+}
 
 io.on('connection', function(client){
   console.log('Client Connection!');
-
   client.on('join', function(name){
     client.nickname = name;
+    messages.forEach(function(msg){
+      client.emit("messages", msg.name + ": " + msg.data);
+    });
   });
-  //client.emit('messages', { hello: 'world' });
   client.on('messages', function(data){
     var nickname = client.nickname;
     console.log(data);
     io.emit("messages", nickname + ": " + data);
+    storeMessage(nickname, data);
   });
-
   client.on('disconnect', function(){
     console.log("Client disconnected")
   });
