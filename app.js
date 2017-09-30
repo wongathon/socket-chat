@@ -7,10 +7,15 @@ var port = process.env.PORT || 8080;
 
 io.on('connection', function(client){
   console.log('Client Connection!');
+
+  client.on('join', function(name){
+    client.nickname = name;
+  });
   //client.emit('messages', { hello: 'world' });
   client.on('messages', function(data){
+    var nickname = client.nickname;
     console.log(data);
-    io.emit("messages", data);
+    io.emit("messages", nickname + ": " + data);
   });
 
   client.on('disconnect', function(){
