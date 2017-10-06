@@ -17,15 +17,22 @@
 <body>
 	<h1>Socket Chat</h1>
 	<hr/>
-	<div id="status">Loading...</div>
+	<div id="status">Waiting...</div>
+	<ul id="chatters">Members:</ul>
   <ul id="messages"></ul>
   <form action="">
     <input id="m" autocomplete="off" /><button>Send</button>
   </form>
 
+
+
 	<!--Socket scripts-->
 	<script src="/socket.io/socket.io.js"></script>
-	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+	<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+
 	<script>
 	 $(function () {
 		var socket = io.connect('http://localhost:8080');
@@ -35,6 +42,18 @@
 			nickname = prompt("What is your alias?");
 
 			socket.emit('join', nickname);
+		});
+
+		socket.on('add chatter', function(name){
+			//Use Data Attr
+			var chatter = $('<li>'+name+'</li>').attr('name', name);
+			$('#chatters').append(chatter);
+		});
+
+		socket.on('remove chatter', function(name){
+			console.log(name + "has left.");
+			//Can improve? Use Data Attr
+			$("li[name='"+name+"']").remove();
 		});
 
 		socket.on('messages', function(data) {
